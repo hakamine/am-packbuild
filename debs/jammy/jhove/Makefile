@@ -1,5 +1,5 @@
 NAME          = jhove
-VERSION       ?= 1.26.1
+VERSION       ?= 1.32.0
 RELEASE	      ?= 1~22.04
 GIT_URL	      = https://github.com/openpreserve/jhove
 DEB_TOPDIR    = "/debbuild"

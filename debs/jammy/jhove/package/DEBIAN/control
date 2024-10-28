@@ -4,7 +4,7 @@ Architecture: all
 Maintainer: Artefactual <sysadmin@artefactual.com>
 Depends: openjdk-8-jre-headless
 Priority: optional
-Version: 1.26.1-RELEASE
+Version: 1.32.0-RELEASE
 Description: JSTOR/Harvard Object Validation Environment
  The concept of representation format, or type, permeates all technical
  areas of digital repositories. Policy and processing decisions
