@@ -1,6 +1,6 @@
 Name: %{name}
 Version: %{version}
-Release: 2%{?dist}
+Release: 1%{?dist}
 Summary: JSTOR/Harvard Object Validation Environment
 Buildrequires: maven, gcc
 Source: https://github.com/openpreserve/jhove/archive/%{version}.zip
@@ -42,6 +42,8 @@ cp -rf lib %{buildroot}/usr/share/jhove/
 cp LICENSE README.md COPYING %{buildroot}/usr/share/doc/jhove/
 
 %changelog
+* Mon Nov 4 2024 - sysadmin@artefactual.com
+- 1.32.0-1 package: Bump version to 1.32.0
 * Mon Sep 25 2023 - sysadmin@artefactual.com
 - 1.26.1-2 package: Fix /usr/bin/jhove and /usr/bin/jhove-gui scripts
 * Tue Jun 28 2023 - sysadmin@artefactual.com
