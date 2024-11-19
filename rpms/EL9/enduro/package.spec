@@ -16,6 +16,7 @@ BuildRequires: which
 A tool to aid automation of Archivematica and surrounding workflows
 
 %build
+make ui
 make build
 
 
