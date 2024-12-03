@@ -5,15 +5,15 @@
 
 # RPM fusion repo
 
-wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/f/ffmpeg-5.1.3-1.el9.x86_64.rpm
-wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/f/ffmpeg-libs-5.1.3-1.el9.x86_64.rpm
+wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/f/ffmpeg-5.1.6-2.el9.x86_64.rpm
+wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/f/ffmpeg-libs-5.1.6-2.el9.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/x/x264-0.163-6.20210613git5db6aa6.el9.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/x/x264-libs-0.163-6.20210613git5db6aa6.el9.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/x/x265-3.5-5.el9.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/x/x265-libs-3.5-5.el9.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/g/gpac-libs-2.0.0-1.el9.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/f/faad2-libs-2.10.1-1.el9.x86_64.rpm
-wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/l/libavdevice-5.1.3-1.el9.x86_64.rpm
+wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/l/libavdevice-5.1.6-2.el9.x86_64.rpm
 
 # CERT Forensics repo
 
