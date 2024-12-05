@@ -11,7 +11,7 @@ Package: archivematica-mcp-client
 Architecture: amd64
 Depends:
 	${misc:Depends},
-	archivematica-common (>= 1.16.0),
+	archivematica-common (>= 1.17.0),
 	atool,
 	bulk-extractor,
 	clamav,

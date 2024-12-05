@@ -5,7 +5,7 @@ DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(PACKAGE)-$(VERSION)"
 GPG_ID        ?= 0F4A4D31
 BRANCH        ?= qa/0.x
-VERSION       ?= 0.22.0
+VERSION       ?= 0.23.0
 RELEASE       ?= -1
 GIT_REPO      = "https://github.com/artefactual/archivematica-storage-service"
 

@@ -46,7 +46,7 @@ else
     sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/archivematica.repo
 [archivematica]
 name=archivematica
-baseurl=https://packages.archivematica.org/1.16.x/rocky9
+baseurl=https://packages.archivematica.org/1.17.x/rocky9
 gpgcheck=1
 gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
@@ -56,7 +56,7 @@ fi
 sudo -u root bash -c 'cat << EOF >> /etc/yum.repos.d/archivematica-extras.repo
 [archivematica-extras]
 name=archivematica-extras
-baseurl=https://packages.archivematica.org/1.16.x/rocky9-extras
+baseurl=https://packages.archivematica.org/1.17.x/rocky9-extras
 gpgcheck=1
 gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1

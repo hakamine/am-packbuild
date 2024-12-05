@@ -1,6 +1,6 @@
 NAME          = archivematica-storage-service
 BRANCH        ?= qa/0.x
-VERSION       ?= 0.22.0
+VERSION       ?= 0.23.0
 RELEASE       ?= 1
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"

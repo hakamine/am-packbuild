@@ -39,15 +39,15 @@ sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-serv
 sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/mysql/app-pass password demo-am"
 sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/app-password-confirm password demo-am"
 
-curl -fsSL https://packages.archivematica.org/1.16.x/key.asc | sudo gpg --dearmor -o /etc/apt/keyrings/archivematica-1.16.x.gpg
-sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.16.x.gpg] http://packages.archivematica.org/1.16.x/ubuntu-externals jammy main" > /etc/apt/sources.list.d/archivematica-externals.list'
+curl -fsSL https://packages.archivematica.org/1.17.x/key.asc | sudo gpg --dearmor -o /etc/apt/keyrings/archivematica-1.17.x.gpg
+sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.17.x.gpg] http://packages.archivematica.org/1.17.x/ubuntu-externals jammy main" > /etc/apt/sources.list.d/archivematica-externals.list'
 
 if [ "${local_repository}" == "true" ] ; then
     sudo -u root bash -c 'cat << EOF > /etc/apt/sources.list.d/archivematica.list
 deb file:/am-packbuild/debs/jammy/_deb_repository ./
 EOF'
 else
-    sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.16.x.gpg] http://packages.archivematica.org/1.16.x/ubuntu jammy main" > /etc/apt/sources.list.d/archivematica.list'
+    sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.17.x.gpg] http://packages.archivematica.org/1.17.x/ubuntu jammy main" > /etc/apt/sources.list.d/archivematica.list'
 fi
 
 sudo apt-get -o Acquire::AllowInsecureRepositories=true update

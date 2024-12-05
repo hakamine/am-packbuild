@@ -4,7 +4,7 @@ pipeline {
   string(defaultValue: 'archivematica', description: '', name: 'PACKAGE')
   string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH')
   string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID')
-  string(defaultValue: '1.16.0', description: '', name: 'VERSION')
+  string(defaultValue: '1.17.0', description: '', name: 'VERSION')
   string(defaultValue: 'beta1', description: '', name: 'RELEASE')
   string(defaultValue: '', description: '', name: 'GIT_REPO')
   string(defaultValue: 'qa/1.x', description: '', name: 'PACKBUILD_BRANCH')

@@ -5,7 +5,7 @@ DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(PACKAGE)-$(VERSION)"
 GPG_ID        ?= 0F4A4D31
 BRANCH        ?= qa/1.x
-VERSION       ?= 1.16.0
+VERSION       ?= 1.17.0
 RELEASE       ?= -1
 GIT_REPO      ?= "https://github.com/artefactual"
 

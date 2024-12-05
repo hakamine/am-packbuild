@@ -21,7 +21,7 @@ may be a bit different between packages, but the most common are `BRANCH`,
 So in order to build a specific branch or version, this command can be used from
 the folder of the package we want to build:
 
-    make BRANCH=qa/1.x VERSION=1.16.0 RELEASE=rc5
+    make BRANCH=qa/1.x VERSION=1.17.0 RELEASE=rc5
 
 Keep in mind that the makefiles are a bit recursive, they will invoke Docker,
 mount the current folder, and run the deb-build target.
