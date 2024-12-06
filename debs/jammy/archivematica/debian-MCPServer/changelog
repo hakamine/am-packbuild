@@ -1,3 +1,10 @@
+archivematica-mcp-server (1:1.17.0-1~22.04) jammy; urgency=high
+
+  * commit: 365b7795e1931acd8f79075ea7ee96388a227725
+  * checkout: v1.17.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 06 Dec 2024 18:47:44 +0000
+
 archivematica-mcp-server (1:1.16.0-1~22.04) jammy; urgency=high
 
   * commit: 48004c5bd798ccb54196720103b462654bf9b08d
