@@ -11,9 +11,10 @@ on:
 jobs:
   vagrant-box-archivematica:
     name: Build and upload
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+      PACKER_LOG: "TRACE"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -26,18 +27,17 @@ jobs:
       run: |
         wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-        sudo apt update && sudo apt install virtualbox-7.0
-    - name: "Downgrade VirtualBox"
-      run: |
-        sudo apt-get purge virtualbox-7.0
-        wget -O /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~focal_amd64.deb -L https://download.virtualbox.org/virtualbox/7.0.14/virtualbox-7.0_7.0.14-161095~Ubuntu~focal_amd64.deb
-        sudo dpkg -i /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~focal_amd64.deb
+        sudo apt update && sudo apt install virtualbox-7.1
+        sudo usermod -a -G vboxusers $USER
     - name: Install packer plugins
       run: |
         packer plugins install github.com/hashicorp/virtualbox
         packer plugins install github.com/hashicorp/ansible
         packer plugins install github.com/hashicorp/vagrant
     - name: Build
+      env:
+        LOGNAME: "runner"
+        USER: "runner"
       run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-20.04-amd64
         packer build -on-error=abort template.json
@@ -45,13 +45,3 @@ jobs:
         packer build -on-error=abort template.json
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-am.box \
           ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
-    - name: Upload
-      run: |
-        cd ${{ github.workspace }}/tools/vagrant-box-uploader
-        bundle install
-        ruby upload.rb \
-          archivematica \
-          '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
-          '${{ secrets.VAGRANT_CLOUD }}' \
-          '${{ github.event.inputs.version }}' \
-          '${{ github.event.inputs.description }}'
