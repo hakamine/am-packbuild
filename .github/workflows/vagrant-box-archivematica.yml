@@ -11,7 +11,7 @@ on:
 jobs:
   vagrant-box-archivematica:
     name: Build and upload
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
     steps:
@@ -26,12 +26,11 @@ jobs:
       run: |
         wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-        sudo apt update && sudo apt install virtualbox-7.0
-    - name: "Downgrade VirtualBox"
+        sudo apt update && sudo apt install virtualbox-7.1
+    - name: Set the user environment as VirtualBox expects it
       run: |
-        sudo apt-get purge virtualbox-7.0
-        wget -O /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~focal_amd64.deb -L https://download.virtualbox.org/virtualbox/7.0.14/virtualbox-7.0_7.0.14-161095~Ubuntu~focal_amd64.deb
-        sudo dpkg -i /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~focal_amd64.deb
+        echo "USER=$USER" >> $GITHUB_ENV
+        echo "LOGNAME=$USER" >> $GITHUB_ENV
     - name: Install packer plugins
       run: |
         packer plugins install github.com/hashicorp/virtualbox
