@@ -9,24 +9,21 @@ on:
         description: Description
         required: true
 jobs:
-  vagrant-box-archivematica:
-    name: Build and upload
+  build-base:
+    name: Build base image
     runs-on: ubuntu-24.04
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
     steps:
     - name: Check out code
       uses: actions/checkout@v4
-    - name: "Install packer"
+    - name: Install packer and VirtualBox
       run: |
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-        sudo apt update && sudo apt install packer
-    - name: "Install VirtualBox"
-      run: |
         wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-        sudo apt update && sudo apt install virtualbox-7.1
+        sudo apt update && sudo apt install --yes packer virtualbox-7.1
     - name: Set the user environment as VirtualBox expects it
       run: |
         echo "USER=$USER" >> $GITHUB_ENV
@@ -40,17 +37,81 @@ jobs:
       run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-20.04-amd64
         packer build -on-error=abort template.json
+    - name: Upload base image
+      uses: actions/upload-artifact@v4
+      with:
+        name: base-image
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+  vagrant-box-archivematica:
+    name: Build and upload AM box
+    runs-on: ubuntu-24.04
+    needs: ["build-base"]
+    env:
+      PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Restore base image
+      uses: actions/download-artifact@v4
+      with:
+        name: base-image
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+    - name: Install packer and VirtualBox
+      run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+        sudo apt update && sudo apt install --yes packer virtualbox-7.1
+    - name: Set the user environment as VirtualBox expects it
+      run: |
+        echo "USER=$USER" >> $GITHUB_ENV
+        echo "LOGNAME=$USER" >> $GITHUB_ENV
+    - name: Update vbox networks
+      run: |
+        sudo mkdir -p /etc/vbox/
+        echo "* 10.10.10.20/24" | sudo tee -a /etc/vbox/networks.conf
+    - name: Install packer plugins
+      run: |
+        packer plugins install github.com/hashicorp/virtualbox
+        packer plugins install github.com/hashicorp/ansible
+        packer plugins install github.com/hashicorp/vagrant
+    - name: Build
+      run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-box-archivematica
         packer build -on-error=abort template.json
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-am.box \
           ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
-    - name: Upload
+    - name: Test
       run: |
-        cd ${{ github.workspace }}/tools/vagrant-box-uploader
-        bundle install
-        ruby upload.rb \
-          archivematica \
-          '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
-          '${{ secrets.VAGRANT_CLOUD }}' \
-          '${{ github.event.inputs.version }}' \
-          '${{ github.event.inputs.description }}'
+        set -eux
+        vagrant init --minimal --no-tty archivematica-vagrant-${{ github.event.inputs.version }}.box file://${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
+        cat Vagrantfile
+        vagrant up --debug-timestamp --provider virtualbox
+        sleep 120
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:this_is_the_am_api_key' \
+                --header 'Content-Type: application/json' \
+                'http://10.10.10.20/api/processing-configuration/' \
+            | jq -r '.processing_configurations == ["automated", "default"]' \
+        ) == true
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:this_is_the_ss_api_key' \
+                --header 'Content-Type: application/json' \
+                'http://10.10.10.20:8000/api/v2/pipeline/' \
+            | jq -r '.meta.total_count == 1' \
+        ) == true
+    # - name: Upload
+    #   run: |
+    #     cd ${{ github.workspace }}/tools/vagrant-box-uploader
+    #     bundle install
+    #     ruby upload.rb \
+    #       archivematica \
+    #       '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
+    #       '${{ secrets.VAGRANT_CLOUD }}' \
+    #       '${{ github.event.inputs.version }}' \
+    #       '${{ github.event.inputs.description }}'
