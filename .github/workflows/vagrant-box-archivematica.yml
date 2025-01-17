@@ -17,7 +17,7 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v4
-    - name: Install packer and VirtualBox
+    - name: Install Packer and VirtualBox
       run: |
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
@@ -28,7 +28,7 @@ jobs:
       run: |
         echo "USER=$USER" >> $GITHUB_ENV
         echo "LOGNAME=$USER" >> $GITHUB_ENV
-    - name: Install packer plugins
+    - name: Install Packer plugins
       run: |
         packer plugins install github.com/hashicorp/virtualbox
         packer plugins install github.com/hashicorp/ansible
@@ -56,13 +56,15 @@ jobs:
       with:
         name: base-image
         path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
-    - name: Install packer and VirtualBox
+    - name: Install Packer, Vagrant and VirtualBox
       run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
         wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-        sudo apt update && sudo apt install --yes packer virtualbox-7.1
+        sudo apt update && sudo apt install --yes packer vagrant virtualbox-7.1
     - name: Set the user environment as VirtualBox expects it
       run: |
         echo "USER=$USER" >> $GITHUB_ENV
@@ -71,7 +73,7 @@ jobs:
       run: |
         sudo mkdir -p /etc/vbox/
         echo "* 10.10.10.20/24" | sudo tee -a /etc/vbox/networks.conf
-    - name: Install packer plugins
+    - name: Install Packer plugins
       run: |
         packer plugins install github.com/hashicorp/virtualbox
         packer plugins install github.com/hashicorp/ansible
@@ -82,13 +84,17 @@ jobs:
         packer build -on-error=abort template.json
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-am.box \
           ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
-    - name: Test
+    - name: Provision a test VM with the new image
       run: |
-        set -eux
-        vagrant init --minimal --no-tty archivematica-vagrant-${{ github.event.inputs.version }}.box file://${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
+        vagrant init --minimal --no-tty archivematica-vagrant-${{ github.event.inputs.version }} file://${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
         cat Vagrantfile
         vagrant up --debug-timestamp --provider virtualbox
-        sleep 120
+    - name: Print Python versions installed
+      run: |
+        vagrant ssh -c "ls -altr /usr/bin/python*"
+    - name: Test AM is running in the test VM
+      run: |
+        sleep 180
         test $( \
             curl \
                 --silent \
