@@ -92,7 +92,6 @@ jobs:
         vagrant ssh -c "ls -altr /usr/bin/python*"
     - name: Test AM is running in the test VM
       run: |
-        sleep 180
         test $( \
             curl \
                 --silent \
